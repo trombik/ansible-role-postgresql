@@ -10,5 +10,8 @@ galaxy_info:
     - name: FreeBSD
       versions:
         - 12.1
+    - name: OpenBSD
+      versions:
+        - 6.6
   galaxy_tags:
     - postgresql
