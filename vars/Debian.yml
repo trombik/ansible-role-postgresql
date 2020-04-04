@@ -1,0 +1,7 @@
+---
+__postgresql_major_version: 10
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/lib/postgresql/{{ __postgresql_major_version }}/main"
+__postgresql_service: postgresql
+__postgresql_package: "postgresql-{{ __postgresql_major_version }}"

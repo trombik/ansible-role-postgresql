@@ -13,5 +13,8 @@ galaxy_info:
     - name: OpenBSD
       versions:
         - 6.6
+    - name: Ubuntu
+      versions:
+        - bionic
   galaxy_tags:
     - postgresql
