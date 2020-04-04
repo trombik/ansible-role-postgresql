@@ -1,0 +1,26 @@
+---
+
+- name: Install postgresql_extra_packages
+  apt:
+    name: "{{ postgresql_extra_packages }}"
+    state: present
+
+- name: "Install {{ postgresql_package }}"
+  apt:
+    name: "{{ postgresql_package }}"
+    state: present
+
+- name: Enable postgresql
+  service:
+    name: "{{ postgresql_service }}"
+    enabled: yes
+
+- name: "Create {{ postgresql_conf_dir }}/environment"
+  template:
+    src: Debian.environment.j2
+    dest: "{{ postgresql_conf_dir }}/environment"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: 0644
+  notify:
+    - Restart postgresql
