@@ -1,0 +1,9 @@
+---
+postgresql_user: postgresql
+postgresql_group: postgresql
+postgresql_log_dir: /var/log/postgresql
+postgresql_db_dir: "{{ __postgresql_db_dir }}"
+postgresql_service: postgresql
+postgresql_conf_dir: "{{ __postgresql_conf_dir }}"
+postgresql_conf_file: "{{ __postgresql_conf_dir }}/postgresql.conf"
+postgresql_flags: ""

@@ -1,0 +1,37 @@
+---
+# tasks file for ansible-role-postgresql
+
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- include: "install-{{ ansible_os_family }}.yml"
+
+- name: Create log directory
+  file:
+    path: "{{ postgresql_log_dir }}"
+    mode: 0755
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+  notify: Restart postgresql
+
+- name: Create db directory
+  file:
+    path: "{{ postgresql_db_dir }}"
+    mode: 0755
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+  notify: Restart postgresql
+
+- name: Create postgresql.conf
+  template:
+    src: postgresql.conf.j2
+    dest: "{{ postgresql_conf_file }}"
+    validate: echo %s
+  notify: Restart postgresql
+
+- name: Start postgresql
+  service:
+    name: "{{ postgresql_service }}"
+    enabled: true
+    state: started

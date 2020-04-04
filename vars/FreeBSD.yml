@@ -1,0 +1,3 @@
+---
+__postgresql_db_dir: /var/db/postgresql
+__postgresql_conf_dir: /usr/local/etc/postgresql

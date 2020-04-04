@@ -1,0 +1,6 @@
+---
+
+- name: Install postgresql
+  pkgng:
+    name: postgresql
+    state: present
