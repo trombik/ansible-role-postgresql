@@ -6,7 +6,7 @@ service = "postgresql"
 user    = "postgres"
 group   = "postgres"
 ports   = [5432]
-db_dir  = "/var/lib/postgresql"
+db_dir  = "/var/lib/postgresql/data"
 extra_packages = []
 
 case os[:family]
@@ -14,6 +14,12 @@ when "freebsd"
   db_dir = "/var/db/postgres/data12"
   package = "databases/postgresql12-server"
   extra_packages = %w[databases/postgresql12-contrib]
+when "openbsd"
+  user = "_postgresql"
+  group = "_postgresql"
+  db_dir = "/var/postgresql/data"
+  package = "postgresql-server"
+  extra_packages = %w[postgresql-contrib]
 end
 
 config = "#{db_dir}/postgresql.conf"
