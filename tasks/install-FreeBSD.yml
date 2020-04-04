@@ -1,6 +1,29 @@
 ---
 
-- name: Install postgresql
+- name: Install postgresql_extra_packages
   pkgng:
-    name: postgresql
+    name: "{{ postgresql_extra_packages }}"
     state: present
+
+- name: "Install {{ postgresql_package }}"
+  pkgng:
+    name: "{{ postgresql_package }}"
+    state: present
+
+- name: Enable postgresql
+  service:
+    name: "{{ postgresql_service }}"
+    enabled: yes
+
+- name: Create /etc/rc.conf.d/postgresql
+  template:
+    src: FreeBSD.rc.j2
+    dest: /etc/rc.conf.d/postgresql
+    validate: sh -n %s
+  notify:
+    - Restart postgresql
+
+- name: Run initdb (FreeBSD)
+  command:
+    cmd: "/usr/local/etc/rc.d/{{ postgresql_service }} initdb"
+    creates: "{{ postgresql_db_dir }}/base"

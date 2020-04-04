@@ -1,48 +1,58 @@
 require "spec_helper"
 require "serverspec"
 
-package = "postgresql"
+package = "postgresql-server"
 service = "postgresql"
-config  = "/etc/postgresql/postgresql.conf"
-user    = "postgresql"
-group   = "postgresql"
-ports   = [PORTS]
-log_dir = "/var/log/postgresql"
+user    = "postgres"
+group   = "postgres"
+ports   = [5432]
 db_dir  = "/var/lib/postgresql"
+extra_packages = []
 
 case os[:family]
 when "freebsd"
-  config = "/usr/local/etc/postgresql.conf"
-  db_dir = "/var/db/postgresql"
+  db_dir = "/var/db/postgres/data12"
+  package = "databases/postgresql12-server"
+  extra_packages = %w[databases/postgresql12-contrib]
 end
+
+config = "#{db_dir}/postgresql.conf"
+hba_config = "#{db_dir}/pg_hba.conf"
 
 describe package(package) do
   it { should be_installed }
 end
 
+extra_packages.each do |p|
+  describe package p do
+    it { should be_installed }
+  end
+end
+
 describe file(config) do
   it { should be_file }
-  its(:content) { should match Regexp.escape("postgresql") }
-end
-
-describe file(log_dir) do
-  it { should exist }
-  it { should be_mode 755 }
+  it { should be_mode 600 }
   it { should be_owned_by user }
   it { should be_grouped_into group }
+  its(:content) { should match(/Managed by ansible/) }
+  its(:content) { should match Regexp.escape("default_text_search_config = 'pg_catalog.english'") }
 end
 
-describe file(db_dir) do
-  it { should exist }
-  it { should be_mode 755 }
+describe file(hba_config) do
+  it { should be_file }
+  it { should be_mode 600 }
   it { should be_owned_by user }
   it { should be_grouped_into group }
+  its(:content) { should match(/Managed by ansible/) }
+  its(:content) { should match(/local\s+all\s+all\s+trust$/) }
 end
 
 case os[:family]
 when "freebsd"
   describe file("/etc/rc.conf.d/postgresql") do
     it { should be_file }
+    its(:content) { should match(/Managed by ansible/) }
+    its(:content) { should match(/postgresql_flags="-w -s -m fast"/) }
   end
 end
 

@@ -3,4 +3,35 @@
   roles:
     - ansible-role-postgresql
   vars:
-    postgresql_config: ""
+    os_postgresql_extra_packages:
+      FreeBSD:
+        - "databases/postgresql{{ postgresql_major_version }}-contrib"
+    os_postgresql_flags:
+      FreeBSD: |
+        postgresql_flags="-w -s -m fast"
+        postgresql_initdb_flags="--encoding=utf-8 --lc-collate=C"
+    postgresql_flags: "{{ os_postgresql_flags[ansible_os_family] }}"
+    postgresql_extra_packages: "{{ os_postgresql_extra_packages[ansible_os_family] }}"
+    postgresql_pg_hba_config: |
+      local   all             all                                     trust
+      host    all             all             127.0.0.1/32            trust
+      host    all             all             ::1/128                 trust
+      local   replication     all                                     trust
+      host    replication     all             127.0.0.1/32            trust
+      host    replication     all             ::1/128                 trust
+    postgresql_config: |
+      max_connections = 100
+      shared_buffers = 128MB
+      dynamic_shared_memory_type = posix
+      max_wal_size = 1GB
+      min_wal_size = 80MB
+      log_destination = 'syslog'
+      log_timezone = 'UTC'
+      update_process_title = off
+      datestyle = 'iso, mdy'
+      timezone = 'UTC'
+      lc_messages = 'C'
+      lc_monetary = 'C'
+      lc_numeric = 'C'
+      lc_time = 'C'
+      default_text_search_config = 'pg_catalog.english'

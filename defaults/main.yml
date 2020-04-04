@@ -1,9 +1,13 @@
 ---
-postgresql_user: postgresql
-postgresql_group: postgresql
-postgresql_log_dir: /var/log/postgresql
+postgresql_user: "{{ __postgresql_user }}"
+postgresql_group: "{{ __postgresql_group }}"
 postgresql_db_dir: "{{ __postgresql_db_dir }}"
-postgresql_service: postgresql
-postgresql_conf_dir: "{{ __postgresql_conf_dir }}"
-postgresql_conf_file: "{{ __postgresql_conf_dir }}/postgresql.conf"
+postgresql_service: "{{ __postgresql_service }}"
+postgresql_package: "{{ __postgresql_package }}"
+postgresql_extra_packages: []
+postgresql_conf_file: "{{ postgresql_db_dir }}/postgresql.conf"
+postgresql_config: ""
+postgresql_pg_hba_conf_file: "{{ postgresql_db_dir }}/pg_hba.conf"
+postgresql_pg_hba_config: ""
 postgresql_flags: ""
+postgresql_major_version: "{{ __postgresql_major_version }}"

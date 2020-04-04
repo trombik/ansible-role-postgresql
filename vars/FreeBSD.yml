@@ -1,3 +1,7 @@
 ---
-__postgresql_db_dir: /var/db/postgresql
-__postgresql_conf_dir: /usr/local/etc/postgresql
+__postgresql_major_version: 12
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/db/postgres/data{{ __postgresql_major_version }}"
+__postgresql_service: postgresql
+__postgresql_package: "databases/postgresql{{ __postgresql_major_version }}-server"
