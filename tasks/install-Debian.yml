@@ -10,6 +10,11 @@
     name: "{{ postgresql_package }}"
     state: present
 
+- name: Install python-psycopg2
+  apt:
+    name: python-psycopg2
+    state: present
+
 - name: Enable postgresql
   service:
     name: "{{ postgresql_service }}"

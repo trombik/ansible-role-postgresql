@@ -10,6 +10,11 @@
     name: "{{ postgresql_package }}"
     state: present
 
+- name: "Install psycopg2"
+  pkgng:
+    name: databases/py-psycopg2
+    state: present
+
 - name: Enable postgresql
   service:
     name: "{{ postgresql_service }}"

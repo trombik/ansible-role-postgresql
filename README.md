@@ -2,6 +2,16 @@
 
 A brief description of the role goes here.
 
+## Notes for FreeBSD users
+
+`databases/py-psycopg2`, which is required by `ansible` modules, must be built
+with the target PostgreSQL version. The ports system does not yet support
+`postgresql` `FLAVOR`. Current default version of `postgresql`,
+`PGSQL_DEFAULT` is defined in `/usr/ports/Mk/bsd.default-versions.mk`. If you
+want to install different version, the package must be built with
+custom `DEFAULT_VERSIONS`, and you must use that package site. See
+https://wiki.freebsd.org/Ports/DEFAULT_VERSIONS
+
 # Requirements
 
 None
