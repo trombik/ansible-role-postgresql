@@ -1,5 +1,5 @@
 ---
-__postgresql_major_version: 12
+__postgresql_major_version: 11
 __postgresql_user: postgres
 __postgresql_group: postgres
 __postgresql_db_dir: "/var/db/postgres/data{{ __postgresql_major_version }}"

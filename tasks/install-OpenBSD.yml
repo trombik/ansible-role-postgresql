@@ -10,6 +10,11 @@
     name: "{{ postgresql_package }}"
     state: present
 
+- name: Install psycopg2
+  openbsd_pkg:
+    name: "py{{ ansible_python.version.major }}-psycopg2"
+    state: present
+
 - name: Enable postgresql
   service:
     name: "{{ postgresql_service }}"

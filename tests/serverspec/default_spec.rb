@@ -10,14 +10,16 @@ ports   = [5432]
 db_dir = nil
 conf_dir = nil
 extra_packages = []
+psycopg2_package = nil
 
 case os[:family]
 when "freebsd"
-  version_major = 12
+  version_major = 11
   db_dir = "/var/db/postgres/data#{version_major}"
-  package = "databases/postgresql12-server"
-  extra_packages = %w[databases/postgresql12-contrib]
+  package = "databases/postgresql#{version_major}-server"
+  extra_packages = ["databases/postgresql#{version_major}-contrib"]
   conf_dir = db_dir
+  psycopg2_package = "databases/py-psycopg2"
 when "openbsd"
   version_major = 11
   user = "_postgresql"
@@ -26,12 +28,14 @@ when "openbsd"
   package = "postgresql-server"
   extra_packages = %w[postgresql-contrib]
   conf_dir = db_dir
+  psycopg2_package = "py3-psycopg2"
 when "ubuntu"
   version_major = 10
   package = "postgresql-#{version_major}"
   conf_dir = "/etc/postgresql/#{version_major}/main"
   extra_packages = %w[postgresql-contrib]
   db_dir = "/var/lib/postgresql/#{version_major}/main"
+  psycopg2_package = "python-psycopg2"
 when "redhat"
   version_major = 12
   package = "postgresql#{version_major}-server"
@@ -39,6 +43,7 @@ when "redhat"
   conf_dir = db_dir
   extra_packages = ["postgresql#{version_major}-contrib"]
   service = "postgresql-#{version_major}"
+  psycopg2_package = "python2-psycopg2"
 end
 
 config = "#{conf_dir}/postgresql.conf"
@@ -52,6 +57,10 @@ extra_packages.each do |p|
   describe package p do
     it { should be_installed }
   end
+end
+
+describe package psycopg2_package do
+  it { should be_installed }
 end
 
 describe file(config) do
