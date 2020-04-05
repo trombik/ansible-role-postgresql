@@ -123,8 +123,8 @@ ports.each do |p|
   end
 end
 
-pgsql_users.each do |user|
-  describe command "env PGPASSWORD=#{user[:password]} psql -h 127.0.0.1 -p 5432 -U #{user[:name]} -c '\\l' template1" do
+pgsql_users.each do |u|
+  describe command "env PGPASSWORD=#{u[:password]} psql -h 127.0.0.1 -p 5432 -U #{u[:name]} -c '\\l' template1" do
     its(:exit_status) { should eq 0 }
     its(:stderr) { should eq "" }
     its(:stdout) { should match(/^\s+template1\s+/) }
