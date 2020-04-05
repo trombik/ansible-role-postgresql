@@ -53,7 +53,7 @@
       data_directory = '{{ postgresql_db_dir }}'
       hba_file = '{{ postgresql_conf_dir }}/pg_hba.conf'
       ident_file = '{{ postgresql_conf_dir }}/pg_ident.conf'
-      external_pid_file = '/var/run/postgresql/10-main.pid'
+      external_pid_file = '/var/run/postgresql/{{ postgresql_major_version }}-main.pid'
       port = 5432
       max_connections = 100
       unix_socket_directories = '/var/run/postgresql'
@@ -64,8 +64,8 @@
       dynamic_shared_memory_type = posix
       log_line_prefix = '%m [%p] %q%u@%d '
       log_timezone = 'UTC'
-      cluster_name = '10/main'
-      stats_temp_directory = '/var/run/postgresql/10-main.pg_stat_tmp'
+      cluster_name = '{{ postgresql_major_version }}/main'
+      stats_temp_directory = '/var/run/postgresql/{{ postgresql_major_version }}-main.pg_stat_tmp'
       datestyle = 'iso, mdy'
       timezone = 'UTC'
       lc_messages = 'en_US'
