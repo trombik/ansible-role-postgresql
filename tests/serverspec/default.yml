@@ -10,12 +10,14 @@
         kern.seminfo.semmni: 60
         kern.seminfo.semmns: 1024
       Debian: {}
+      RedHat: {}
     sysctl: "{{ os_sysctl[ansible_os_family] }}"
 
     os_postgresql_initdb_flags:
       FreeBSD: --encoding=utf-8 --lc-collate=C
       OpenBSD: "-D {{ postgresql_db_dir }} -U {{ postgresql_user }} --encoding=utf-8 --lc-collate=C --locale=en_US.UTF-8"
       Debian: ""
+      RedHat: ""
     postgresql_initdb_flags: "{{ os_postgresql_initdb_flags[ansible_os_family] }}"
 
     os_postgresql_extra_packages:
@@ -25,6 +27,8 @@
         - postgresql-contrib
       Debian:
         - postgresql-contrib
+      RedHat:
+        - "postgresql{{ postgresql_major_version }}-contrib"
 
     os_postgresql_flags:
       FreeBSD: |
@@ -32,6 +36,7 @@
         postgresql_initdb_flags="--encoding=utf-8 --lc-collate=C"
       OpenBSD: ""
       Debian: ""
+      RedHat: ""
     postgresql_flags: "{{ os_postgresql_flags[ansible_os_family] }}"
 
     postgresql_extra_packages: "{{ os_postgresql_extra_packages[ansible_os_family] }}"
