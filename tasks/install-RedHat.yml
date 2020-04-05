@@ -1,0 +1,25 @@
+---
+
+- name: Install pgdg-redhat-repo-latest.noarch.rpm
+  yum:
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}/pgdg-redhat-repo-latest.noarch.rpm
+
+- name: Install postgresql_extra_packages
+  yum:
+    name: "{{ postgresql_extra_packages }}"
+    state: present
+
+- name: "Install {{ postgresql_package }}"
+  yum:
+    name: "{{ postgresql_package }}"
+    state: present
+
+- name: Enable postgresql
+  service:
+    name: "{{ postgresql_service }}"
+    enabled: yes
+
+- name: Run initdb
+  command:
+    cmd: "/usr/pgsql-{{ postgresql_major_version }}/bin/postgresql-{{ postgresql_major_version }}-setup initdb"
+    creates: "{{ postgresql_db_dir }}/base"

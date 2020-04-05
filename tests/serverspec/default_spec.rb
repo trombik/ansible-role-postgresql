@@ -6,8 +6,8 @@ service = "postgresql"
 user    = "postgres"
 group   = "postgres"
 ports   = [5432]
-version_major = nil
-db_dir  = nil
+# version_major = nil
+db_dir = nil
 conf_dir = nil
 extra_packages = []
 
@@ -31,7 +31,14 @@ when "ubuntu"
   package = "postgresql-#{version_major}"
   conf_dir = "/etc/postgresql/#{version_major}/main"
   extra_packages = %w[postgresql-contrib]
-  db_dir  = "/var/lib/postgresql/#{version_major}/main"
+  db_dir = "/var/lib/postgresql/#{version_major}/main"
+when "redhat"
+  version_major = 12
+  package = "postgresql#{version_major}-server"
+  db_dir = "/var/lib/pgsql/#{version_major}/data"
+  conf_dir = db_dir
+  extra_packages = ["postgresql#{version_major}-contrib"]
+  service = "postgresql-#{version_major}"
 end
 
 config = "#{conf_dir}/postgresql.conf"
@@ -89,6 +96,12 @@ end
 describe service(service) do
   it { should be_running }
   it { should be_enabled }
+end
+
+describe command "psql --version" do
+  its(:exit_status) { should eq 0 }
+  its(:stderr) { should eq "" }
+  its(:stdout) { should match(/^psql.* #{version_major}\.\d+/) }
 end
 
 ports.each do |p|
