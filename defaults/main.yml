@@ -13,3 +13,5 @@ postgresql_pg_hba_config: ""
 postgresql_flags: ""
 postgresql_major_version: "{{ __postgresql_major_version }}"
 postgresql_initdb_flags: ""
+postgresql_users: []
+postgresql_debug: no
