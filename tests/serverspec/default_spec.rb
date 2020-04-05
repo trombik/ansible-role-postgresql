@@ -11,6 +11,10 @@ db_dir = nil
 conf_dir = nil
 extra_packages = []
 psycopg2_package = nil
+pgsql_users = [
+  { name: "root", password: "AdminPassWord" },
+  { name: "foo", password: "PassWord" }
+]
 
 case os[:family]
 when "freebsd"
@@ -116,5 +120,13 @@ end
 ports.each do |p|
   describe port(p) do
     it { should be_listening }
+  end
+end
+
+pgsql_users.each do |user|
+  describe command "env PGPASSWORD=#{user[:password]} psql -h 127.0.0.1 -p 5432 -U #{user[:name]} -c '\\l' template1" do
+    its(:exit_status) { should eq 0 }
+    its(:stderr) { should eq "" }
+    its(:stdout) { should match(/^\s+template1\s+/) }
   end
 end

@@ -4,6 +4,7 @@
     - role: trombik.sysctl
     - ansible-role-postgresql
   vars:
+    postgresql_debug: yes
     os_sysctl:
       FreeBSD: {}
       OpenBSD:
@@ -90,3 +91,18 @@
       lc_time = 'C'
       default_text_search_config = 'pg_catalog.english'
       {% endif %}
+    postgresql_users:
+      - name: foo
+        # PassWord
+        # echo md5`echo -n 'PassWordfoo' | md5`
+        password: md5019145e613f681f6ec91b2157b6922a7
+        # XXX login_user and db are required on OpenBSD
+        login_user: "{{ postgresql_user }}"
+        db: template1
+      - name: root
+        # AdminPassWord
+        # echo md5`echo -n 'AdminPassWordroot' | md5`
+        password: md55a93c2c23f842b93516fc8e9133d8840
+        role_attr_flags: SUPERUSER
+        login_user: "{{ postgresql_user }}"
+        db: template1
