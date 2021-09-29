@@ -1,18 +1,64 @@
 ---
 
+# XXX create postgres user and group
+# because:
+#   * initial password file must be created before installing postgresql
+#   * the user and the group do not exist before installing postgresql
+- name: Create postgresql_group
+  group:
+    name: "{{ postgresql_group }}"
+
+- name: Create postgresql_user
+  ansible.builtin.user:
+    name: "{{ postgresql_user }}"
+    comment: PostgreSQL administrator
+    create_home: yes
+    home: "{{ postgresql_home_dir }}"
+    group: "{{ postgresql_group }}"
+    shell: /bin/bash
+
+# XXX follow Debian's way. they use their own wrappers. it is claimed "most
+# people do not need to bother about initdb" in README.Debian.gz
+- name: Create /etc/postgresql-common/createcluster.d
+  file:
+    path: /etc/postgresql-common/createcluster.d
+    state: directory
+
+# XXX run initdb here, not in tasks/main.yml
+- name: Create initdb.conf
+  template:
+    src: Debian.initdb.conf.j2
+    dest: /etc/postgresql-common/createcluster.d/initdb.conf
+
+- name: "See if {{ postgresql_db_dir }}/base exists"
+  ansible.builtin.stat:
+    path: "{{ postgresql_db_dir }}/base"
+  register: __stat_postgresql_db_dir
+
+- name: Create initial password file
+  ansible.builtin.copy:
+    content: "{{ postgresql_initial_password }}"
+    dest: "{{ postgresql_initial_password_file }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: '0600'
+  when:
+    - "(not __stat_postgresql_db_dir.stat or not __stat_postgresql_db_dir.stat.exists)"
+
+- name: "Install {{ postgresql_package }}"
+  apt:
+    name: "{{ postgresql_package }}"
+    update_cache: yes
+    state: present
+
 - name: Install postgresql_extra_packages
   apt:
     name: "{{ postgresql_extra_packages }}"
     state: present
 
-- name: "Install {{ postgresql_package }}"
+- name: Install python3-psycopg2
   apt:
-    name: "{{ postgresql_package }}"
-    state: present
-
-- name: Install python-psycopg2
-  apt:
-    name: python-psycopg2
+    name: python3-psycopg2
     state: present
 
 - name: Enable postgresql

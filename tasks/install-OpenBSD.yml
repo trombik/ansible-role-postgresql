@@ -20,10 +20,3 @@
     name: "{{ postgresql_service }}"
     arguments: "{{ postgresql_flags }}"
     enabled: yes
-
-- name: Run initdb
-  command:
-    cmd: "initdb {{ postgresql_initdb_flags }}"
-    creates: "{{ postgresql_db_dir }}/base"
-  become: yes
-  become_user: "{{ postgresql_user }}"

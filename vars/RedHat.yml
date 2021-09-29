@@ -5,3 +5,6 @@ __postgresql_group: postgres
 __postgresql_db_dir: "/var/lib/pgsql/{{ __postgresql_major_version }}/data"
 __postgresql_service: "postgresql-{{ __postgresql_major_version }}"
 __postgresql_package: "postgresql{{ __postgresql_major_version }}-server"
+__postgresql_home_dir: "/var/lib/pgsql"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: postgres
