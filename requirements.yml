@@ -1,3 +1,5 @@
 ---
-
-- name: trombik.sysctl
+roles:
+  - name: trombik.sysctl
+collections:
+  - name: community.postgresql

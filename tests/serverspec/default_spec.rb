@@ -18,14 +18,14 @@ pgsql_users = [
 
 case os[:family]
 when "freebsd"
-  version_major = 11
+  version_major = 12
   db_dir = "/var/db/postgres/data#{version_major}"
   package = "databases/postgresql#{version_major}-server"
   extra_packages = ["databases/postgresql#{version_major}-contrib"]
   conf_dir = db_dir
   psycopg2_package = "databases/py-psycopg2"
 when "openbsd"
-  version_major = 11
+  version_major = 13
   user = "_postgresql"
   group = "_postgresql"
   db_dir = "/var/postgresql/data"
@@ -34,12 +34,12 @@ when "openbsd"
   conf_dir = db_dir
   psycopg2_package = "py3-psycopg2"
 when "ubuntu"
-  version_major = 10
+  version_major = 12
   package = "postgresql-#{version_major}"
   conf_dir = "/etc/postgresql/#{version_major}/main"
   extra_packages = %w[postgresql-contrib]
   db_dir = "/var/lib/postgresql/#{version_major}/main"
-  psycopg2_package = "python-psycopg2"
+  psycopg2_package = "python3-psycopg2"
 when "redhat"
   version_major = 12
   package = "postgresql#{version_major}-server"
@@ -86,7 +86,12 @@ describe file(hba_config) do
   it { should be_owned_by user }
   it { should be_grouped_into group }
   its(:content) { should match(/Managed by ansible/) }
-  its(:content) { should match(/local\s+all\s+all\s+trust$/) }
+  case os[:family]
+  when "ubuntu"
+    its(:content) { should match(%r{host\s+all\s+all\s+127.0.0.1/32\s+md5$}) }
+  else
+    its(:content) { should match(%r{host\s+all\s+all\s+127.0.0.1/32\s+scram-sha-256$}) }
+  end
 end
 
 case os[:family]
@@ -129,4 +134,10 @@ pgsql_users.each do |u|
     its(:stderr) { should eq "" }
     its(:stdout) { should match(/^\s+template1\s+/) }
   end
+end
+
+describe command "env PGPASSWORD=AdminPassWord psql -h 127.0.0.1 -p 5432 -U root -c '\\l' template1" do
+  its(:stderr) { should eq "" }
+  its(:stdout) { should match(/bar\s+\|\s+foo\s+\|\s+UTF8\s+\|/) }
+  its(:exit_status) { should eq 0 }
 end

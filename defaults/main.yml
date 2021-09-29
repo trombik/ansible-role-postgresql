@@ -13,5 +13,15 @@ postgresql_pg_hba_config: ""
 postgresql_flags: ""
 postgresql_major_version: "{{ __postgresql_major_version }}"
 postgresql_initdb_flags: ""
-postgresql_users: []
 postgresql_debug: no
+postgresql_home_dir: "{{ __postgresql_home_dir }}"
+postgresql_initial_password: ""
+postgresql_initial_password_file: "{{ postgresql_home_dir }}/.pw"
+postgresql_default_auth_method: "{{ __postgresql_default_auth_method }}"
+postgresql_default_login_user: "{{ postgresql_user }}"
+postgresql_default_login_password: "{{ postgresql_initial_password }}"
+postgresql_default_login_host: 127.0.0.1
+postgresql_default_login_db: "{{ __postgresql_default_login_db }}"
+postgresql_users: []
+postgresql_databases: []
+postgresql_initdb_env: {}

@@ -7,6 +7,34 @@
 - name: "Include install-{{ ansible_os_family }}.yml"
   include: "install-{{ ansible_os_family }}.yml"
 
+- name: "See if {{ postgresql_db_dir }}/base exists"
+  ansible.builtin.stat:
+    path: "{{ postgresql_db_dir }}/base"
+  register: __stat_postgresql_db_dir
+
+- name: Create initial password file
+  ansible.builtin.copy:
+    content: "{{ postgresql_initial_password }}"
+    dest: "{{ postgresql_initial_password_file }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: '0600'
+  when:
+    - "(not __stat_postgresql_db_dir.stat or not __stat_postgresql_db_dir.stat.exists)"
+
+- name: Run initdb
+  command: "{{ postgresql_initdb_command }} {{ postgresql_initdb_flags }}"
+  args:
+    creates: "{{ postgresql_db_dir }}/base"
+  environment: "{{ postgresql_initdb_env }}"
+  when:
+    - "(not __stat_postgresql_db_dir.stat or not __stat_postgresql_db_dir.stat.exists)"
+
+- name: Remove postgresql_initial_password_file
+  file:
+    path: "{{ postgresql_initial_password_file }}"
+    state: absent
+
 - name: Create postgresql.conf
   template:
     src: postgresql.conf.j2
@@ -26,30 +54,58 @@
     name: "{{ postgresql_service }}"
     state: started
 
-- name: Create, delete, or modify postgresql_users
-  postgresql_user:
-    name: "{{ item.name }}"
-    ca_cert: "{{ item.ca_cert | default(omit) }}"
-    conn_limit: "{{ item.conn_limit | default(omit) }}"
-    db: "{{ item.db | default(omit) }}"
-    encrypted: "{{ item.encrypted | default(omit) }}"
-    expires: "{{ item.expires | default(omit) }}"
-    fail_on_user: "{{ item.fail_on_user | default(omit) }}"
-    groups: "{{ item.groups | default(omit) }}"
-    login_host: "{{ item.login_host | default(omit) }}"
-    login_password: "{{ item.login_password | default(omit) }}"
-    login_unix_socket: "{{ item.login_unix_socket | default(omit) }}"
-    login_user: "{{ item.login_user | default(omit) }}"
-    no_password_changes: "{{ item.no_password_changes | default(omit) }}"
-    password: "{{ item.password | default(omit) }}"
-    port: "{{ item.port | default(omit) }}"
-    role_attr_flags: "{{ item.role_attr_flags | default(omit) }}"
-    session_role: "{{ item.session_role | default(omit) }}"
-    ssl_mode: "{{ item.ssl_mode | default(omit) }}"
-    state: "{{ item.state | default(omit) }}"
-  become: yes
-  become_user: "{{ postgresql_user }}"
-  no_log: "{% if postgresql_debug %}no{% else %}yes{% endif %}"
-  vars:
-    ansible_ssh_pipelining: yes
+- name: Manage postgresql_users
+  community.postgresql.postgresql_user:
+    ca_cert: "{{ item['ca_cert'] | default(omit) }}"
+    comment: "{{ item['comment'] | default(omit) }}"
+    conn_limit: "{{ item['conn_limit'] | default(omit) }}"
+    encrypted: "{{ item['encrypted'] | default(omit) }}"
+    expires: "{{ item['expires'] | default(omit) }}"
+    fail_on_user: "{{ item['fail_on_user'] | default(omit) }}"
+    groups: "{{ item['groups'] | default(omit) }}"
+    login_db: "{{ item['login_db'] | default(postgresql_default_login_db) }}"
+    login_host: "{{ item['login_host'] | default(postgresql_default_login_host) }}"
+    login_password: "{{ item['login_password'] | default(postgresql_default_login_password) }}"
+    login_unix_socket: "{{ item['login_unix_socket'] | default(omit) }}"
+    login_user: "{{ item['login_user'] | default(postgresql_default_login_user) }}"
+    name: "{{ item['name'] }}"
+    no_password_changes: "{{ item['no_password_changes'] | default(omit) }}"
+    password: "{{ item['password'] | default(omit) }}"
+    port: "{{ item['port'] | default(omit) }}"
+    priv: "{{ item['priv'] | default(omit) }}"
+    role_attr_flags: "{{ item['role_attr_flags'] | default(omit) }}"
+    session_role: "{{ item['session_role'] | default(omit) }}"
+    ssl_mode: "{{ item['ssl_mode'] | default(omit) }}"
+    state: "{{ item['state'] | default(omit) }}"
+    trust_input: "{{ item['trust_input'] | default(omit) }}"
+  environment:
+    PGOPTIONS: "-c password_encryption={{ postgresql_default_auth_method }}"
   with_items: "{{ postgresql_users }}"
+
+- name: Manage postgresql_databases
+  community.postgresql.postgresql_db:
+    ca_cert: "{{ item['ca_cert'] | default(omit) }}"
+    conn_limit: "{{ item['conn_limit'] | default(omit) }}"
+    dump_extra_args: "{{ item['dump_extra_args'] | default(omit) }}"
+    encoding: "{{ item['encoding'] | default(omit) }}"
+    lc_collate: "{{ item['lc_collate'] | default(omit) }}"
+    lc_ctype: "{{ item['lc_ctype'] | default(omit) }}"
+    login_host: "{{ item['login_host'] | default(postgresql_default_login_host) }}"
+    login_password: "{{ item['login_password'] | default(postgresql_default_login_password) }}"
+    login_unix_socket: "{{ item['login_unix_socket'] | default(omit) }}"
+    login_user: "{{ item['login_user'] | default(postgresql_default_login_user) }}"
+    maintenance_db: "{{ item['maintenance_db'] | default(postgresql_default_login_db) }}"
+    name: "{{ item['name'] }}"
+    owner: "{{ item['owner'] | default(omit) }}"
+    port: "{{ item['port'] | default(omit) }}"
+    session_role: "{{ item['session_role'] | default(omit) }}"
+    ssl_mode: "{{ item['ssl_mode'] | default(omit) }}"
+    state: "{{ item['state'] | default(omit) }}"
+    tablespace: "{{ item['tablespace'] | default(omit) }}"
+    target: "{{ item['target'] | default(omit) }}"
+    target_opts: "{{ item['target_opts'] | default(omit) }}"
+    template: "{{ item['template'] | default(omit) }}"
+    trust_input: "{{ item['trust_input'] | default(omit) }}"
+  environment:
+    PGOPTIONS: "-c password_encryption={{ postgresql_default_auth_method }}"
+  with_items: "{{ postgresql_databases }}"

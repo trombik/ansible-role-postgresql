@@ -27,8 +27,3 @@
     validate: sh -n %s
   notify:
     - Restart postgresql
-
-- name: Run initdb
-  command:
-    cmd: "/usr/local/etc/rc.d/{{ postgresql_service }} initdb"
-    creates: "{{ postgresql_db_dir }}/base"

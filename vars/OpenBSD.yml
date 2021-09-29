@@ -1,7 +1,10 @@
 ---
-__postgresql_major_version: 11
+__postgresql_major_version: 13
 __postgresql_user: _postgresql
 __postgresql_group: _postgresql
 __postgresql_db_dir: "/var/postgresql/data"
 __postgresql_service: postgresql
 __postgresql_package: postgresql-server
+__postgresql_home_dir: "/var/postgresql"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: template1
