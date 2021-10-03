@@ -1,25 +1,25 @@
 ---
 
 - name: Install pgdg-redhat-repo-latest.noarch.rpm
-  yum:
+  ansible.builtin.yum:
     name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}/pgdg-redhat-repo-latest.noarch.rpm
 
 - name: Install postgresql_extra_packages
-  yum:
+  ansible.builtin.yum:
     name: "{{ postgresql_extra_packages }}"
     state: present
 
 - name: "Install {{ postgresql_package }}"
-  yum:
+  ansible.builtin.yum:
     name: "{{ postgresql_package }}"
     state: present
 
 - name: Install psycopg2
-  yum:
+  ansible.builtin.yum:
     name: "python{{ ansible_python.version.major }}-psycopg2"
     state: present
 
 - name: Enable postgresql
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_service }}"
     enabled: yes
