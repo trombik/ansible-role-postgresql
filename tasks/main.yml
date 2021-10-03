@@ -23,7 +23,7 @@
     - "(not __stat_postgresql_db_dir.stat or not __stat_postgresql_db_dir.stat.exists)"
 
 - name: Run initdb
-  command: "{{ postgresql_initdb_command }} {{ postgresql_initdb_flags }}"
+  ansible.builtin.command: "{{ postgresql_initdb_command }} {{ postgresql_initdb_flags }}"
   args:
     creates: "{{ postgresql_db_dir }}/base"
   environment: "{{ postgresql_initdb_env }}"
@@ -31,26 +31,26 @@
     - "(not __stat_postgresql_db_dir.stat or not __stat_postgresql_db_dir.stat.exists)"
 
 - name: Remove postgresql_initial_password_file
-  file:
+  ansible.builtin.file:
     path: "{{ postgresql_initial_password_file }}"
     state: absent
 
 - name: Create postgresql.conf
-  template:
+  ansible.builtin.template:
     src: postgresql.conf.j2
     dest: "{{ postgresql_conf_file }}"
     mode: 0600
   notify: Restart postgresql
 
 - name: Create pg_hba.conf
-  template:
+  ansible.builtin.template:
     src: pg_hba.conf.j2
     dest: "{{ postgresql_pg_hba_conf_file }}"
     mode: 0600
   notify: Restart postgresql
 
 - name: Start postgresql
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_service }}"
     state: started
 
@@ -81,6 +81,7 @@
   environment:
     PGOPTIONS: "-c password_encryption={{ postgresql_default_auth_method }}"
   with_items: "{{ postgresql_users }}"
+  no_log: "{% if postgresql_debug %}no{% else %}yes{% endif %}"
 
 - name: Manage postgresql_databases
   community.postgresql.postgresql_db:
@@ -109,3 +110,4 @@
   environment:
     PGOPTIONS: "-c password_encryption={{ postgresql_default_auth_method }}"
   with_items: "{{ postgresql_databases }}"
+  no_log: "{% if postgresql_debug %}no{% else %}yes{% endif %}"

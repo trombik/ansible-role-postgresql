@@ -1,27 +1,27 @@
 ---
 
 - name: Install postgresql_extra_packages
-  pkgng:
+  ansible.builtin.pkgng:
     name: "{{ postgresql_extra_packages }}"
     state: present
 
 - name: "Install {{ postgresql_package }}"
-  pkgng:
+  ansible.builtin.pkgng:
     name: "{{ postgresql_package }}"
     state: present
 
 - name: "Install psycopg2"
-  pkgng:
+  ansible.builtin.pkgng:
     name: databases/py-psycopg2
     state: present
 
 - name: Enable postgresql
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_service }}"
     enabled: yes
 
 - name: Create /etc/rc.conf.d/postgresql
-  template:
+  ansible.builtin.template:
     src: FreeBSD.rc.j2
     dest: /etc/rc.conf.d/postgresql
     validate: sh -n %s
