@@ -4,14 +4,14 @@
   ansible.builtin.yum:
     name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}/pgdg-redhat-repo-latest.noarch.rpm
 
-- name: Install postgresql_extra_packages
-  ansible.builtin.yum:
-    name: "{{ postgresql_extra_packages }}"
-    state: present
-
 - name: "Install {{ postgresql_package }}"
   ansible.builtin.yum:
     name: "{{ postgresql_package }}"
+    state: present
+
+- name: Install postgresql_extra_packages
+  ansible.builtin.yum:
+    name: "{{ postgresql_extra_packages }}"
     state: present
 
 - name: Install psycopg2

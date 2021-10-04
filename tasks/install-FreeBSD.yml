@@ -1,13 +1,13 @@
 ---
 
-- name: Install postgresql_extra_packages
-  ansible.builtin.pkgng:
-    name: "{{ postgresql_extra_packages }}"
-    state: present
-
 - name: "Install {{ postgresql_package }}"
   ansible.builtin.pkgng:
     name: "{{ postgresql_package }}"
+    state: present
+
+- name: Install postgresql_extra_packages
+  ansible.builtin.pkgng:
+    name: "{{ postgresql_extra_packages }}"
     state: present
 
 - name: "Install psycopg2"
