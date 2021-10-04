@@ -1,3 +1,10 @@
+## Release 1.1.1
+
+* 2693a03 bugfix: remove postgresql_initdb_command
+* 6c93d97 bugfix: install postgresql_extra_packages after postgresql_package
+* cbd96be bugfix: update gems
+* a71bb41 bugfix: implement postgresql_debug
+
 ## Release 1.1.0
 
 * 25aa589 ci: add GitHub Actions
