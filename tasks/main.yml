@@ -22,11 +22,8 @@
   when:
     - "(not __stat_postgresql_db_dir.stat or not __stat_postgresql_db_dir.stat.exists)"
 
-- name: Run initdb
-  ansible.builtin.command: "{{ postgresql_initdb_command }} {{ postgresql_initdb_flags }}"
-  args:
-    creates: "{{ postgresql_db_dir }}/base"
-  environment: "{{ postgresql_initdb_env }}"
+- name: "Include initdb-{{ ansible_os_family }}.yml"
+  include_tasks: "initdb-{{ ansible_os_family }}.yml"
   when:
     - "(not __stat_postgresql_db_dir.stat or not __stat_postgresql_db_dir.stat.exists)"
 

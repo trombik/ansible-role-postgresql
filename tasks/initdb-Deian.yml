@@ -1,0 +1,3 @@
+---
+
+# do nothing because initdb is executed during installation

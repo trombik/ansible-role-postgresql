@@ -89,34 +89,22 @@
         owner: foo
         state: present
 
+    project_postgresql_initdb_flags: --encoding=utf-8 --lc-collate=C --locale=en_US.UTF-8
+    project_postgresql_initdb_flags_pwfile: "--pwfile={{ postgresql_initial_password_file }}"
+    project_postgresql_initdb_flags_auth: "--auth-host={{ postgresql_default_auth_method }} --auth-local={{ postgresql_default_auth_method }}"
     os_postgresql_initdb_flags:
-      FreeBSD: ""
-      OpenBSD: ""
-      RedHat: ""
+      FreeBSD: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
+      OpenBSD: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
+      RedHat: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
       # XXX you cannot use --auth-host or --auth-local here because
-      # pg_createcluster, which is executed during the installation, override
+      # pg_createcluster, which is executed during the installation, overrides
       # them, forcing md5
-      Debian: "--encoding=utf-8 --lc-collate=C --locale=en_US.UTF-8 --pwfile={{ postgresql_initial_password_file }}"
+      Debian: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }}"
+
     postgresql_initdb_flags: "{{ os_postgresql_initdb_flags[ansible_os_family] }}"
-
-    os_postgresql_initdb_env:
-      FreeBSD: {}
-      OpenBSD: {}
-      Debian: {}
-      RedHat:
-        PGSETUP_INITDB_OPTIONS: "-D {{ postgresql_db_dir }} -U {{ postgresql_user }} --encoding=utf-8 --lc-collate=C --locale=en_US.UTF-8 --auth-host={{ postgresql_default_auth_method }} --auth-local={{ postgresql_default_auth_method }} --pwfile={{ postgresql_initial_password_file }}"
-    postgresql_initdb_env: "{{ os_postgresql_initdb_env[ansible_os_family] }}"
-
-    os_postgresql_initdb_command:
-      FreeBSD: /usr/local/etc/rc.d/postgresql initdb
-      OpenBSD: "su -l {{ postgresql_user }} -c '/usr/local/bin/initdb -D {{ postgresql_db_dir }} -U {{ postgresql_user }} --encoding=utf-8 --lc-collate=C --locale=en_US.UTF-8 --auth-host={{ postgresql_default_auth_method }} --auth-local={{ postgresql_default_auth_method }} --pwfile={{ postgresql_initial_password_file }}'"
-      RedHat: "/usr/pgsql-{{ postgresql_major_version }}/bin/postgresql-{{ postgresql_major_version }}-setup initdb"
-      Debian: False
-    postgresql_initdb_command: "{{ os_postgresql_initdb_command[ansible_os_family] }}"
     os_postgresql_flags:
       FreeBSD: |
         postgresql_flags="-w -s -m fast"
-        postgresql_initdb_flags="--encoding=utf-8 --lc-collate=C --auth-host={{ postgresql_default_auth_method }} --auth-local={{ postgresql_default_auth_method }} --pwfile={{ postgresql_initial_password_file }}"
       OpenBSD: ""
       Debian: ""
       RedHat: ""
