@@ -54,6 +54,7 @@ None
     - role: trombik.sysctl
     - ansible-role-postgresql
   vars:
+    postgresql_initial_password: password
     postgresql_debug: yes
     os_sysctl:
       FreeBSD: {}
@@ -63,13 +64,6 @@ None
       Debian: {}
       RedHat: {}
     sysctl: "{{ os_sysctl[ansible_os_family] }}"
-
-    os_postgresql_initdb_flags:
-      FreeBSD: --encoding=utf-8 --lc-collate=C
-      OpenBSD: "-D {{ postgresql_db_dir }} -U {{ postgresql_user }} --encoding=utf-8 --lc-collate=C --locale=en_US.UTF-8"
-      Debian: ""
-      RedHat: ""
-    postgresql_initdb_flags: "{{ os_postgresql_initdb_flags[ansible_os_family] }}"
 
     os_postgresql_extra_packages:
       FreeBSD:
@@ -81,20 +75,10 @@ None
       RedHat:
         - "postgresql{{ postgresql_major_version }}-contrib"
 
-    os_postgresql_flags:
-      FreeBSD: |
-        postgresql_flags="-w -s -m fast"
-        postgresql_initdb_flags="--encoding=utf-8 --lc-collate=C"
-      OpenBSD: ""
-      Debian: ""
-      RedHat: ""
-    postgresql_flags: "{{ os_postgresql_flags[ansible_os_family] }}"
-
     postgresql_extra_packages: "{{ os_postgresql_extra_packages[ansible_os_family] }}"
     postgresql_pg_hba_config: |
-      local   all             all                                     trust
-      host    all             all             127.0.0.1/32            trust
-      host    all             all             ::1/128                 trust
+      host    all             all             127.0.0.1/32            {{ postgresql_default_auth_method }}
+      host    all             all             ::1/128                 {{ postgresql_default_auth_method }}
       local   replication     all                                     trust
       host    replication     all             127.0.0.1/32            trust
       host    replication     all             ::1/128                 trust
@@ -118,12 +102,13 @@ None
       stats_temp_directory = '/var/run/postgresql/{{ postgresql_major_version }}-main.pg_stat_tmp'
       datestyle = 'iso, mdy'
       timezone = 'UTC'
-      lc_messages = 'en_US'
-      lc_monetary = 'en_US'
-      lc_numeric = 'en_US'
-      lc_time = 'en_US'
+      lc_messages = 'C'
+      lc_monetary = 'C'
+      lc_numeric = 'C'
+      lc_time = 'C'
       default_text_search_config = 'pg_catalog.english'
       include_dir = 'conf.d'
+      password_encryption = {{ postgresql_default_auth_method }}
       {% else %}
       max_connections = 100
       shared_buffers = 128MB
@@ -140,22 +125,40 @@ None
       lc_numeric = 'C'
       lc_time = 'C'
       default_text_search_config = 'pg_catalog.english'
+      password_encryption = {{ postgresql_default_auth_method }}
       {% endif %}
     postgresql_users:
       - name: foo
-        # PassWord
-        # echo md5`echo -n 'PassWordfoo' | md5`
-        password: md5019145e613f681f6ec91b2157b6922a7
-        # XXX login_user and db are required on OpenBSD
-        login_user: "{{ postgresql_user }}"
-        db: template1
+        password: PassWord
       - name: root
-        # AdminPassWord
-        # echo md5`echo -n 'AdminPassWordroot' | md5`
-        password: md55a93c2c23f842b93516fc8e9133d8840
+        password: AdminPassWord
         role_attr_flags: SUPERUSER
-        login_user: "{{ postgresql_user }}"
-        db: template1
+
+    postgresql_databases:
+      - name: bar
+        owner: foo
+        state: present
+
+    project_postgresql_initdb_flags: --encoding=utf-8 --lc-collate=C --locale=en_US.UTF-8
+    project_postgresql_initdb_flags_pwfile: "--pwfile={{ postgresql_initial_password_file }}"
+    project_postgresql_initdb_flags_auth: "--auth-host={{ postgresql_default_auth_method }} --auth-local={{ postgresql_default_auth_method }}"
+    os_postgresql_initdb_flags:
+      FreeBSD: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
+      OpenBSD: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
+      RedHat:  "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
+      # XXX you cannot use --auth-host or --auth-local here because
+      # pg_createcluster, which is executed during the installation, overrides
+      # them, forcing md5
+      Debian:  "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }}"
+
+    postgresql_initdb_flags: "{{ os_postgresql_initdb_flags[ansible_os_family] }}"
+    os_postgresql_flags:
+      FreeBSD: |
+        postgresql_flags="-w -s -m fast"
+      OpenBSD: ""
+      Debian: ""
+      RedHat: ""
+    postgresql_flags: "{{ os_postgresql_flags[ansible_os_family] }}"
 ```
 
 # License

@@ -1,0 +1,7 @@
+---
+
+- name: Run initdb
+  ansible.builtin.command: /usr/local/etc/rc.d/postgresql initdb
+  args:
+    creates: "{{ postgresql_db_dir }}/base"
+  environment: "{{ postgresql_initdb_env }}"
