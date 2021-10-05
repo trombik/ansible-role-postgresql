@@ -56,6 +56,7 @@ when "redhat"
   extra_packages = ["postgresql#{version_major}-contrib"]
   service = "postgresql-#{version_major}"
   psycopg2_package = "python2-psycopg2"
+  python_bin = "python"
 end
 
 config = "#{conf_dir}/postgresql.conf"
