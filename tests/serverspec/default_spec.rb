@@ -15,6 +15,7 @@ pgsql_users = [
   { name: "root", password: "AdminPassWord" },
   { name: "foo", password: "PassWord" }
 ]
+python_bin = "python3"
 
 case os[:family]
 when "freebsd"
@@ -146,5 +147,11 @@ end
 describe command "env PGPASSWORD=AdminPassWord psql -h 127.0.0.1 -p 5432 -U root -c '\\l' template1" do
   its(:stderr) { should eq "" }
   its(:stdout) { should match(/bar\s+\|\s+foo\s+\|\s+UTF8\s+\|/) }
+  its(:exit_status) { should eq 0 }
+end
+
+describe command "#{python_bin} -c 'import psycopg2'" do
+  its(:stderr) { should eq "" }
+  its(:stdout) { should eq "" }
   its(:exit_status) { should eq 0 }
 end
