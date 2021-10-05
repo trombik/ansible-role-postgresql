@@ -1,3 +1,8 @@
+## Release 1.1.2
+
+* fd56a9e bugfix: QA
+* 4e15a61 bugfix: support Devuan
+
 ## Release 1.1.1
 
 * 2693a03 bugfix: remove postgresql_initdb_command
