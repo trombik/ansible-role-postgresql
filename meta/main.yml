@@ -19,5 +19,8 @@ galaxy_info:
     - name: EL
       versions:
         - 7
+    - name: Devuan
+      versions:
+        - beowulf
   galaxy_tags:
     - postgresql
