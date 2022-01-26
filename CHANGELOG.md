@@ -1,3 +1,9 @@
+## Release 1.2.0
+
+* c3e566e update: bump default version to 13 on FreeBSD
+* 338eeb8 bugfix: use python on CentOS, instead of python3
+* 98a505d bugfix: test if psycopg2 is usable
+
 ## Release 1.1.2
 
 * fd56a9e bugfix: QA
