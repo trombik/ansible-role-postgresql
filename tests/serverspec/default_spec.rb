@@ -19,7 +19,7 @@ python_bin = "python3"
 
 case os[:family]
 when "freebsd"
-  version_major = 12
+  version_major = 13
   db_dir = "/var/db/postgres/data#{version_major}"
   package = "databases/postgresql#{version_major}-server"
   extra_packages = ["databases/postgresql#{version_major}-contrib"]
