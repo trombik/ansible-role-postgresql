@@ -1,6 +1,10 @@
 ---
 driver:
   name: vagrant
+  customize:
+    memory: 2048
+  # XXX increase boot_timeout. Ubuntu 20.04 sometimes timeouts in CI.
+  boot_timeout: 600
 
 transport:
   name: rsync

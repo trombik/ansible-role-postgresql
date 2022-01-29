@@ -1,0 +1,41 @@
+---
+name: kitchen
+on:
+  - pull_request
+  - push
+jobs:
+  kitchen:
+    runs-on: macos-10.15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+
+      - name: Cache vagrant boxes
+        uses: actions/cache@v2
+        env:
+          cache-name: vagrant-boxes
+        with:
+          path: ~/.vagrant.d/boxes/
+          # XXX using .kitchen.yml as cache key is not very efficient because
+          # the file has other configuration options, such as log level, and
+          # when you change options not related to vagrant boxes, cache
+          # becomes invalid.
+          key: vagrant-boxes-${{ hashFiles('**/.kitchen.yml') }}
+
+      - name: Show vagrant version
+        run: |
+          Vagrant --version
+
+      - name: Show VirtualBox version
+        run: |
+          virtualbox -h
+
+      - name: Run test-kitchen
+        run: |
+          bundle exec kitchen test
