@@ -4,8 +4,31 @@ on:
   - pull_request
   - push
 jobs:
+  list:
+    runs-on: macos-10.15
+    outputs:
+      instances: ${{ steps.set-instances.outputs.instances }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+
+      - name: Set instances for matrix build
+        id: set-instances
+        run: |
+          echo ::set-output name=instances::$(bundle exec kitchen list -j | jq --compact-output 'map(.instance)')
+
   kitchen:
     runs-on: macos-10.15
+    needs: list
+    strategy:
+      matrix:
+        instance: ${{ fromJSON(needs.list.outputs.instances) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -26,7 +49,7 @@ jobs:
           # the file has other configuration options, such as log level, and
           # when you change options not related to vagrant boxes, cache
           # becomes invalid.
-          key: vagrant-boxes-${{ hashFiles('**/.kitchen.yml') }}
+          key: vagrant-boxes-${{ hashFiles('**/.kitchen.yml') }}-${{ matrix.instance }}
 
       - name: Show vagrant version
         run: |
@@ -38,4 +61,4 @@ jobs:
 
       - name: Run test-kitchen
         run: |
-          bundle exec kitchen test
+          bundle exec kitchen test ${{ matrix.instance }}
