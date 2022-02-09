@@ -25,5 +25,6 @@
     src: FreeBSD.rc.j2
     dest: /etc/rc.conf.d/postgresql
     validate: sh -n %s
+    mode: "0644"
   notify:
     - Restart postgresql

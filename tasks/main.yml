@@ -43,14 +43,14 @@
   ansible.builtin.template:
     src: postgresql.conf.j2
     dest: "{{ postgresql_conf_file }}"
-    mode: 0600
+    mode: "0600"
   notify: Restart postgresql
 
 - name: Create pg_hba.conf
   ansible.builtin.template:
     src: pg_hba.conf.j2
     dest: "{{ postgresql_pg_hba_conf_file }}"
-    mode: 0600
+    mode: "0600"
   notify: Restart postgresql
 
 - name: Start postgresql
