@@ -48,14 +48,18 @@ when "devuan"
   extra_packages = %w[postgresql-contrib]
   db_dir = "/var/lib/postgresql/#{version_major}/main"
   psycopg2_package = "python3-psycopg2"
-when "redhat"
+when "redhat", "fedora"
   version_major = 12
   package = "postgresql#{version_major}-server"
   db_dir = "/var/lib/pgsql/#{version_major}/data"
   conf_dir = db_dir
   extra_packages = ["postgresql#{version_major}-contrib"]
   service = "postgresql-#{version_major}"
-  psycopg2_package = "python2-psycopg2"
+  if os[:family] == "fedora"
+    psycopg2_package = "python3-psycopg2"
+  else
+    psycopg2_package = "python2-psycopg2"
+  end
   python_bin = "python"
 end
 

@@ -23,5 +23,8 @@ galaxy_info:
     - name: Devuan
       versions:
         - beowulf
+    - name: Fedora
+      versions:
+        - 35
   galaxy_tags:
     - postgresql

@@ -1,8 +1,29 @@
 ---
 
+- name: Install libselinux-python
+  yum:
+    name: libselinux-python3
+    state: present
+
+- name: Set fact __fact_postgresql_distribution_redhat_prefix
+  set_fact:
+    __fact_postgresql_redhat_prefix:
+      RedHat: EL
+      CentOS: EL
+      Fedora: F
+    __fact_postgresql_redhat_variant:
+      RedHat: redhat
+      CentOS: redhat
+      Fedora: fedora
+
+- name: Install RPM-GPG-KEY-PGDG key
+  rpm_key:
+    key: "https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG-{{ postgresql_major_version }}"
+    state: present
+
 - name: Install pgdg-redhat-repo-latest.noarch.rpm
   ansible.builtin.yum:
-    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}/pgdg-redhat-repo-latest.noarch.rpm
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/{{ __fact_postgresql_redhat_prefix[ansible_distribution] }}-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}/pgdg-{{ __fact_postgresql_redhat_variant[ansible_distribution] }}-repo-latest.noarch.rpm
 
 - name: "Install {{ postgresql_package }}"
   ansible.builtin.yum:
