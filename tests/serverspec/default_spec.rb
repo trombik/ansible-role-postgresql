@@ -55,11 +55,11 @@ when "redhat", "fedora"
   conf_dir = db_dir
   extra_packages = ["postgresql#{version_major}-contrib"]
   service = "postgresql-#{version_major}"
-  if os[:family] == "fedora"
-    psycopg2_package = "python3-psycopg2"
-  else
-    psycopg2_package = "python2-psycopg2"
-  end
+  psycopg2_package = if os[:family] == "fedora"
+                       "python3-psycopg2"
+                     else
+                       "python2-psycopg2"
+                     end
   python_bin = "python"
 end
 
