@@ -4,7 +4,24 @@ on:
   - pull_request
   - push
 jobs:
+  pre_build:
+
+    # A job to see if the entrire jobs should be skipped.
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v3.4.1
+        with:
+          concurrent_skipping: same_content
+          skip_after_successful_duplicate: 'true'
+          paths_ignore: '["**/*.md", "**/docs/**"]'
+          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+
   list:
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     runs-on: macos-10.15
     outputs:
       instances: ${{ steps.set-instances.outputs.instances }}
@@ -25,7 +42,10 @@ jobs:
 
   kitchen:
     runs-on: macos-10.15
-    needs: list
+    needs:
+      - pre_build
+      - list
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         instance: ${{ fromJSON(needs.list.outputs.instances) }}
