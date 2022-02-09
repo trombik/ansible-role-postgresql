@@ -1,3 +1,12 @@
+## Release 1.3.0
+
+* 70a1a0e bugfix: QA
+* acf4754 ci: update kitchen workflow
+* 2e2f88c feat: support Fedora
+* d66c7eb ci: build in parallel with matrix
+* e374b7e feat: support OpenBSD 7.0
+* edde2f1 ci: add test-kitchen to CI
+
 ## Release 1.2.0
 
 * c3e566e update: bump default version to 13 on FreeBSD
