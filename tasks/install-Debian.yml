@@ -29,6 +29,7 @@
   ansible.builtin.template:
     src: Debian.initdb.conf.j2
     dest: /etc/postgresql-common/createcluster.d/initdb.conf
+    mode: "0644"
 
 - name: "See if {{ postgresql_db_dir }}/base exists"
   ansible.builtin.stat:
@@ -72,6 +73,6 @@
     dest: "{{ postgresql_conf_dir }}/environment"
     owner: "{{ postgresql_user }}"
     group: "{{ postgresql_group }}"
-    mode: 0644
+    mode: "0644"
   notify:
     - Restart postgresql
