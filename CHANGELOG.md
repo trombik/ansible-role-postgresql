@@ -1,3 +1,9 @@
+## Release 1.3.1
+
+* 2cf70ac bugfix: default to ansible_distribution_version
+* 9f85e11 update: support Devuan 4
+* 445e451 bugfix: fix risky-file-permissions, quote octal values
+
 ## Release 1.3.0
 
 * 70a1a0e bugfix: QA
