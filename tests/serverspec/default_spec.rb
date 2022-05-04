@@ -42,7 +42,7 @@ when "ubuntu"
   db_dir = "/var/lib/postgresql/#{version_major}/main"
   psycopg2_package = "python3-psycopg2"
 when "devuan"
-  version_major = 11
+  version_major = os[:release].to_f >= 4 ? 13 : 11
   package = "postgresql-#{version_major}"
   conf_dir = "/etc/postgresql/#{version_major}/main"
   extra_packages = %w[postgresql-contrib]
