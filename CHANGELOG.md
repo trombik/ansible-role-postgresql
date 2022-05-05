@@ -1,3 +1,8 @@
+## Release 1.3.2
+
+* 62e1a8c bugfix: switch to hspaans/ansible-galaxy-action
+* a6f54b5 bugfix: install postgresql from official repo on Fedora
+
 ## Release 1.3.1
 
 * 2cf70ac bugfix: default to ansible_distribution_version
