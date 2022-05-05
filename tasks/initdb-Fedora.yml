@@ -1,0 +1,12 @@
+---
+
+- name: Set default environment for initdb
+  set_fact:
+    __postgresql_fact_initdb_environment:
+      PGSETUP_INITDB_OPTIONS: "{{ postgresql_initdb_flags }}"
+
+- name: Run initdb
+  ansible.builtin.command: "postgresql-setup initdb"
+  args:
+    creates: "{{ postgresql_db_dir }}/base"
+  environment: "{{ __postgresql_fact_initdb_environment | combine(postgresql_initdb_env) }}"

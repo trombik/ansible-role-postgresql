@@ -1,0 +1,26 @@
+---
+
+- name: Install libselinux-python
+  yum:
+    name: libselinux-python3
+    state: present
+
+- name: "Install {{ postgresql_package }}"
+  ansible.builtin.dnf:
+    name: "{{ postgresql_package }}"
+    state: present
+
+- name: Install postgresql_extra_packages
+  ansible.builtin.dnf:
+    name: "{{ postgresql_extra_packages }}"
+    state: present
+
+- name: Install psycopg2
+  ansible.builtin.dnf:
+    name: "python{{ ansible_python.version.major }}-psycopg2"
+    state: present
+
+- name: Enable postgresql
+  ansible.builtin.service:
+    name: "{{ postgresql_service }}"
+    enabled: yes
