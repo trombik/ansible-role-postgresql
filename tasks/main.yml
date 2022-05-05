@@ -15,8 +15,15 @@
       paths:
         - vars
 
-- name: "Include install-{{ ansible_os_family }}.yml"
-  include: "install-{{ ansible_os_family }}.yml"
+- name: Include OS-specific install task file
+  include: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "install-{{ ansible_distribution }}.yml"
+        - "install-{{ ansible_os_family }}.yml"
+      paths:
+        - tasks
 
 - name: "See if {{ postgresql_db_dir }}/base exists"
   ansible.builtin.stat:
@@ -33,8 +40,8 @@
   when:
     - "(not __stat_postgresql_db_dir.stat or not __stat_postgresql_db_dir.stat.exists)"
 
-- name: "Include initdb-{{ ansible_os_family }}.yml"
-  include_tasks: "initdb-{{ ansible_os_family }}.yml"
+- name: "Include initdb-{{ ansible_distribution }}.yml"
+  include_tasks: "initdb-{{ ansible_distribution }}.yml"
   when:
     - "(not __stat_postgresql_db_dir.stat or not __stat_postgresql_db_dir.stat.exists)"
 

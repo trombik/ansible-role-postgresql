@@ -20,12 +20,20 @@
         - "databases/postgresql{{ postgresql_major_version }}-contrib"
       OpenBSD:
         - postgresql-contrib
+      Devuan:
+        - postgresql-contrib
+      Ubuntu:
+        - postgresql-contrib
       Debian:
         - postgresql-contrib
       RedHat:
         - "postgresql{{ postgresql_major_version }}-contrib"
+      CentOS:
+        - "postgresql{{ postgresql_major_version }}-contrib"
+      Fedora:
+        - postgresql-contrib
 
-    postgresql_extra_packages: "{{ os_postgresql_extra_packages[ansible_os_family] }}"
+    postgresql_extra_packages: "{{ os_postgresql_extra_packages[ansible_distribution] }}"
     postgresql_pg_hba_config: |
       host    all             all             127.0.0.1/32            {{ postgresql_default_auth_method }}
       host    all             all             ::1/128                 {{ postgresql_default_auth_method }}
