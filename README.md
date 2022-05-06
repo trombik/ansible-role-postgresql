@@ -41,6 +41,126 @@ None
 | `postgresql_users` | list of `postgresql` users | `[]` |
 | `postgresql_debug` | if true, disable `no_log` | `no` |
 
+## Debian
+
+```text
+---
+__postgresql_major_version: 12
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/lib/postgresql/{{ postgresql_major_version }}/main"
+__postgresql_service: postgresql
+__postgresql_package: postgresql-{{ postgresql_major_version }}
+__postgresql_home_dir: "/var/lib/postgresql"
+__postgresql_default_auth_method: md5
+__postgresql_default_login_db: postgres
+```
+
+## Fedora
+
+```text
+---
+__postgresql_major_version: 12
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/lib/pgsql/data"
+__postgresql_service: postgresql
+__postgresql_package: "@postgresql:{{ postgresql_major_version }}/server"
+__postgresql_home_dir: "/var/lib/pgsql"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: postgres
+```
+
+## FreeBSD
+
+```text
+---
+__postgresql_major_version: 13
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/db/postgres/data{{ postgresql_major_version }}"
+__postgresql_service: postgresql
+__postgresql_package: databases/postgresql{{ postgresql_major_version }}-server
+__postgresql_home_dir: "/var/db/postgres"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: postgres
+```
+
+## OpenBSD
+
+```text
+---
+__postgresql_major_version: 13
+__postgresql_user: _postgresql
+__postgresql_group: _postgresql
+__postgresql_db_dir: "/var/postgresql/data"
+__postgresql_service: postgresql
+__postgresql_package: postgresql-server
+__postgresql_home_dir: "/var/postgresql"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: template1
+```
+
+## RedHat
+
+```text
+---
+__postgresql_major_version: 12
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/lib/pgsql/{{ postgresql_major_version }}/data"
+__postgresql_service: postgresql-{{ postgresql_major_version }}
+__postgresql_package: postgresql{{ postgresql_major_version }}-server
+__postgresql_home_dir: "/var/lib/pgsql"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: postgres
+```
+
+## Devuan-3
+
+```text
+---
+__postgresql_major_version: 11
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/lib/postgresql/{{ postgresql_major_version }}/main"
+__postgresql_service: postgresql
+__postgresql_package: postgresql-{{ postgresql_major_version }}
+__postgresql_home_dir: "/var/lib/postgresql"
+__postgresql_default_auth_method: md5
+__postgresql_default_login_db: postgres
+```
+
+## Devuan-4
+
+```text
+---
+__postgresql_major_version: 13
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/lib/postgresql/{{ postgresql_major_version }}/main"
+__postgresql_service: postgresql
+__postgresql_package: postgresql-{{ postgresql_major_version }}
+__postgresql_home_dir: "/var/lib/postgresql"
+__postgresql_default_auth_method: md5
+__postgresql_default_login_db: postgres
+```
+
+## Ubuntu-20
+
+```text
+---
+__postgresql_major_version: 12
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/lib/postgresql/{{ postgresql_major_version }}/main"
+__postgresql_service: postgresql
+__postgresql_package: postgresql-{{ postgresql_major_version }}
+__postgresql_home_dir: "/var/lib/postgresql"
+__postgresql_default_auth_method: md5
+__postgresql_default_login_db: postgres
+```
+
 # Dependencies
 
 None
@@ -56,6 +176,15 @@ None
   vars:
     postgresql_initial_password: password
     postgresql_debug: yes
+    os_postgresql_major_version:
+      Devuan: "{% if ansible_distribution_version | int >= 4 %}13{% else %}11{% endif %}"
+      Ubuntu: 12
+    # XXX use version 13 where possible because trusted extension, which is
+    # introduced in 13, is a critical feature in automation.
+    #
+    # see "An Overview of Trusted Extensions in PostgreSQL 13" at
+    # https://severalnines.com/database-blog/overview-trusted-extensions-postgresql-13
+    postgresql_major_version: "{{ os_postgresql_major_version[ansible_distribution] | default(13) }}"
     os_sysctl:
       FreeBSD: {}
       OpenBSD:
@@ -70,12 +199,20 @@ None
         - "databases/postgresql{{ postgresql_major_version }}-contrib"
       OpenBSD:
         - postgresql-contrib
+      Devuan:
+        - postgresql-contrib
+      Ubuntu:
+        - postgresql-contrib
       Debian:
         - postgresql-contrib
       RedHat:
         - "postgresql{{ postgresql_major_version }}-contrib"
+      CentOS:
+        - "postgresql{{ postgresql_major_version }}-contrib"
+      Fedora:
+        - postgresql-contrib
 
-    postgresql_extra_packages: "{{ os_postgresql_extra_packages[ansible_os_family] }}"
+    postgresql_extra_packages: "{{ os_postgresql_extra_packages[ansible_distribution] }}"
     postgresql_pg_hba_config: |
       host    all             all             127.0.0.1/32            {{ postgresql_default_auth_method }}
       host    all             all             ::1/128                 {{ postgresql_default_auth_method }}
@@ -145,11 +282,11 @@ None
     os_postgresql_initdb_flags:
       FreeBSD: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
       OpenBSD: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
-      RedHat:  "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
+      RedHat: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }} {{ project_postgresql_initdb_flags_auth }}"
       # XXX you cannot use --auth-host or --auth-local here because
       # pg_createcluster, which is executed during the installation, overrides
       # them, forcing md5
-      Debian:  "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }}"
+      Debian: "{{ project_postgresql_initdb_flags }} {{ project_postgresql_initdb_flags_pwfile }}"
 
     postgresql_initdb_flags: "{{ os_postgresql_initdb_flags[ansible_os_family] }}"
     os_postgresql_flags:
