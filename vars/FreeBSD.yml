@@ -2,9 +2,9 @@
 __postgresql_major_version: 13
 __postgresql_user: postgres
 __postgresql_group: postgres
-__postgresql_db_dir: "/var/db/postgres/data{{ __postgresql_major_version }}"
+__postgresql_db_dir: "/var/db/postgres/data{{ postgresql_major_version }}"
 __postgresql_service: postgresql
-__postgresql_package: "databases/postgresql{{ __postgresql_major_version }}-server"
+__postgresql_package: "databases/postgresql{{ postgresql_major_version }}-server"
 __postgresql_home_dir: /var/db/postgres
 __postgresql_default_auth_method: scram-sha-256
 __postgresql_default_login_db: postgres

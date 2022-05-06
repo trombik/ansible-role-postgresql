@@ -6,6 +6,15 @@
   vars:
     postgresql_initial_password: password
     postgresql_debug: yes
+    os_postgresql_major_version:
+      Devuan: "{% if ansible_distribution_version | int >= 4 %}13{% else %}11{% endif %}"
+      Ubuntu: 12
+    # XXX use version 13 where possible because trusted extension, which is
+    # introduced in 13, is a critical feature in automation.
+    #
+    # see "An Overview of Trusted Extensions in PostgreSQL 13" at
+    # https://severalnines.com/database-blog/overview-trusted-extensions-postgresql-13
+    postgresql_major_version: "{{ os_postgresql_major_version[ansible_distribution] | default(13) }}"
     os_sysctl:
       FreeBSD: {}
       OpenBSD:

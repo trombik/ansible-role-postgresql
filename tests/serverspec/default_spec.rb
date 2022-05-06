@@ -49,7 +49,7 @@ when "devuan"
   db_dir = "/var/lib/postgresql/#{version_major}/main"
   psycopg2_package = "python3-psycopg2"
 when "redhat"
-  version_major = 12
+  version_major = 13
   package = "postgresql#{version_major}-server"
   db_dir = "/var/lib/pgsql/#{version_major}/data"
   conf_dir = db_dir
@@ -58,7 +58,7 @@ when "redhat"
   psycopg2_package = "python2-psycopg2"
   python_bin = "python"
 when "fedora"
-  version_major = 12
+  version_major = 13
   package = "postgresql-server"
   db_dir = "/var/lib/pgsql/data"
   conf_dir = db_dir
