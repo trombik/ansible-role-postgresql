@@ -1,3 +1,7 @@
+## Release 1.4.0
+
+* 9eeaa7d update: use version 13 in tests where possible
+
 ## Release 1.3.2
 
 * 62e1a8c bugfix: switch to hspaans/ansible-galaxy-action
