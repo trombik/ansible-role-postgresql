@@ -18,7 +18,4 @@ jobs:
       - name: Release Ansible Role to Galaxy
         uses: hspaans/ansible-galaxy-action@v0.2.9
         with:
-          # add GALAXY_API_KEY to repository secrets. the API key can be found
-          # at:
-          # https://galaxy.ansible.com/me/preferences
           api_key: ${{ secrets.galaxy_api_key }}
