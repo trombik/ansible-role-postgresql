@@ -1,3 +1,9 @@
+## Release 1.5.0
+
+* 4952c5a doc: update README
+* 8cbc579 feat: support Debian 11
+* 7cc3776 ci: update GitHub Actions workflows
+
 ## Release 1.4.0
 
 * 9eeaa7d update: use version 13 in tests where possible
