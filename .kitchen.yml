@@ -88,6 +88,14 @@ platforms:
       extra_vars:
         ansible_python_interpreter: '/usr/bin/python3'
 
+  - name: debian-11-amd64
+    driver:
+      box: trombik/ansible-debian-11-amd64
+      box_check_update: false
+    provisioner:
+      extra_vars:
+        ansible_python_interpreter: '/usr/bin/python3'
+
   - name: fedora-35-amd64
     driver:
       box: trombik/ansible-fedora-35-amd64

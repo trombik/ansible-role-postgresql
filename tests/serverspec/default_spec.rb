@@ -41,7 +41,7 @@ when "ubuntu"
   extra_packages = %w[postgresql-contrib]
   db_dir = "/var/lib/postgresql/#{version_major}/main"
   psycopg2_package = "python3-psycopg2"
-when "devuan"
+when "devuan", "debian"
   version_major = os[:release].to_f >= 4 ? 13 : 11
   package = "postgresql-#{version_major}"
   conf_dir = "/etc/postgresql/#{version_major}/main"
@@ -93,7 +93,7 @@ describe file(config) do
   its(:content) { should match(/Managed by ansible/) }
   its(:content) { should match Regexp.escape("default_text_search_config = 'pg_catalog.english'") }
   case os[:family]
-  when "ubuntu", "devuan"
+  when "ubuntu", "devuan", "debian"
     its(:content) { should match Regexp.escape("data_directory = '#{db_dir}'") }
   end
 end
@@ -105,7 +105,7 @@ describe file(hba_config) do
   it { should be_grouped_into group }
   its(:content) { should match(/Managed by ansible/) }
   case os[:family]
-  when "ubuntu", "devuan"
+  when "ubuntu", "devuan", "debian"
     its(:content) { should match(%r{host\s+all\s+all\s+127.0.0.1/32\s+md5$}) }
   else
     its(:content) { should match(%r{host\s+all\s+all\s+127.0.0.1/32\s+scram-sha-256$}) }
@@ -119,7 +119,7 @@ when "freebsd"
     its(:content) { should match(/Managed by ansible/) }
     its(:content) { should match(/postgresql_flags="-w -s -m fast"/) }
   end
-when "ubuntu", "devuan"
+when "ubuntu", "devuan", "debian"
   describe file("#{conf_dir}/environment") do
     it { should be_file }
     it { should be_mode 644 }
