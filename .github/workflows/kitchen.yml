@@ -19,8 +19,33 @@ jobs:
           paths_ignore: '["**/*.md", "**/docs/**"]'
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
 
-  list:
+  lint:
     needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Lint Ansible Playbook
+        # XXX use SHA instead of tag. existing tags in releases page do not
+        # work. ansible-lint-action deliverately does not tag the repository.
+        #
+        # https://github.com/ansible/ansible-lint-action/issues/45
+        uses: ansible/ansible-lint-action@c37fb7b4bda2c8cb18f4942716bae9f11b0dc9bc
+        with:
+          targets: ""
+          # XXX workaround a bug mentioned in:
+          # https://github.com/ansible/ansible-lint-action/issues/59
+          #
+          # ImportError: cannot import name 'render_group' from 'rich.console'
+          override-deps: |
+            ansible-lint==5.3.2
+
+  list:
+    needs:
+      - pre_build
+      - lint
     if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     runs-on: macos-10.15
     outputs:
@@ -38,7 +63,9 @@ jobs:
       - name: Set instances for matrix build
         id: set-instances
         run: |
+          CACHE_EPOCH=1
           echo ::set-output name=instances::$(bundle exec kitchen list -j | jq --compact-output 'map(.instance)')
+          echo ::set-output name=cache-epoch::${CACHE_EPOCH}
 
   kitchen:
     runs-on: macos-10.15
@@ -61,6 +88,7 @@ jobs:
 
       - name: Cache vagrant boxes
         uses: actions/cache@v2
+        id: vagrant-box-cache
         env:
           cache-name: vagrant-boxes
         with:
@@ -69,7 +97,9 @@ jobs:
           # the file has other configuration options, such as log level, and
           # when you change options not related to vagrant boxes, cache
           # becomes invalid.
-          key: vagrant-boxes-${{ hashFiles('**/.kitchen.yml') }}-${{ matrix.instance }}
+          key: vagrant-boxes-${{ hashFiles('**/.kitchen.yml') }}-${{ needs.list.outputs.cache-epoch }}-${{ matrix.instance }}
+          restore-keys: |
+            vagrant-boxes-${{ hashFiles('**/.kitchen.yml') }}-${{ needs.list.outputs.cache-epoch }}-${{ matrix.instance }}
 
       - name: Show vagrant version
         run: |
@@ -79,6 +109,45 @@ jobs:
         run: |
           virtualbox -h
 
+      - name: Download and add box file from trombik/ansible-vm-build
+        if: steps.vagrant-box-cache.outputs.cache-hit != 'true'
+
+        # XXX download box files from the latest release page because vagrant
+        # cloud has a rather strict rate limit.
+        #
+        # see
+        # https://github.com/trombik/ansible-vm-build
+        run: |
+          VAGRANT_CLOUD_USER="trombik"
+          LATEST_BOX_URL_BASE="https://github.com/trombik/ansible-vm-build/releases/latest/download"
+
+          # i.e. ansible-freebsd-13.0-amd64
+          BOX_NAME=$(bundle exec kitchen diag ${{ matrix.instance }} | ruby -e 'require "json"; require "yaml"; puts YAML.load(STDIN).to_json;' | jq '.instances[].driver.box | split("/")[1]' | sed -e 's/"//g')
+
+          # download box file from the repository if the box file is
+          # available. if not, box is downloaded from vagrant cloud as a
+          # fallback.
+          if curl --head --location --fail "${LATEST_BOX_URL_BASE}/${BOX_NAME}.box"; then
+            Vagrant box add --name ${VAGRANT_CLOUD_USER}/${BOX_NAME} "${LATEST_BOX_URL_BASE}/${BOX_NAME}.box"
+          fi
+
       - name: Run test-kitchen
         run: |
           bundle exec kitchen test ${{ matrix.instance }}
+  all_build:
+    # a meta job that requires all of the above so that repository
+    # admin can choose a single test name in "Require status checks to pass
+    # before merging". A trick obtained from:
+    #
+    # https://github.com/jazzband/pip-tools/issues/1085#issuecomment-619172509
+    name: All build
+    runs-on: ubuntu-latest
+    needs:
+      - pre_build
+      - lint
+      - list
+      - kitchen
+    steps:
+      - name:
+        run: |
+          echo "All builds finished"
