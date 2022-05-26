@@ -41,11 +41,12 @@ None
 | `postgresql_users` | list of `postgresql` users | `[]` |
 | `postgresql_debug` | if true, disable `no_log` | `no` |
 
+
 ## Debian
 
-```text
+```yaml
 ---
-__postgresql_major_version: 12
+__postgresql_major_version: 13
 __postgresql_user: postgres
 __postgresql_group: postgres
 __postgresql_db_dir: "/var/lib/postgresql/{{ postgresql_major_version }}/main"
@@ -56,69 +57,9 @@ __postgresql_default_auth_method: md5
 __postgresql_default_login_db: postgres
 ```
 
-## Fedora
-
-```text
----
-__postgresql_major_version: 12
-__postgresql_user: postgres
-__postgresql_group: postgres
-__postgresql_db_dir: "/var/lib/pgsql/data"
-__postgresql_service: postgresql
-__postgresql_package: "@postgresql:{{ postgresql_major_version }}/server"
-__postgresql_home_dir: "/var/lib/pgsql"
-__postgresql_default_auth_method: scram-sha-256
-__postgresql_default_login_db: postgres
-```
-
-## FreeBSD
-
-```text
----
-__postgresql_major_version: 13
-__postgresql_user: postgres
-__postgresql_group: postgres
-__postgresql_db_dir: "/var/db/postgres/data{{ postgresql_major_version }}"
-__postgresql_service: postgresql
-__postgresql_package: databases/postgresql{{ postgresql_major_version }}-server
-__postgresql_home_dir: "/var/db/postgres"
-__postgresql_default_auth_method: scram-sha-256
-__postgresql_default_login_db: postgres
-```
-
-## OpenBSD
-
-```text
----
-__postgresql_major_version: 13
-__postgresql_user: _postgresql
-__postgresql_group: _postgresql
-__postgresql_db_dir: "/var/postgresql/data"
-__postgresql_service: postgresql
-__postgresql_package: postgresql-server
-__postgresql_home_dir: "/var/postgresql"
-__postgresql_default_auth_method: scram-sha-256
-__postgresql_default_login_db: template1
-```
-
-## RedHat
-
-```text
----
-__postgresql_major_version: 12
-__postgresql_user: postgres
-__postgresql_group: postgres
-__postgresql_db_dir: "/var/lib/pgsql/{{ postgresql_major_version }}/data"
-__postgresql_service: postgresql-{{ postgresql_major_version }}
-__postgresql_package: postgresql{{ postgresql_major_version }}-server
-__postgresql_home_dir: "/var/lib/pgsql"
-__postgresql_default_auth_method: scram-sha-256
-__postgresql_default_login_db: postgres
-```
-
 ## Devuan-3
 
-```text
+```yaml
 ---
 __postgresql_major_version: 11
 __postgresql_user: postgres
@@ -133,7 +74,7 @@ __postgresql_default_login_db: postgres
 
 ## Devuan-4
 
-```text
+```yaml
 ---
 __postgresql_major_version: 13
 __postgresql_user: postgres
@@ -146,9 +87,69 @@ __postgresql_default_auth_method: md5
 __postgresql_default_login_db: postgres
 ```
 
+## Fedora
+
+```yaml
+---
+__postgresql_major_version: 12
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/lib/pgsql/data"
+__postgresql_service: postgresql
+__postgresql_package: "@postgresql:{{ postgresql_major_version }}/server"
+__postgresql_home_dir: "/var/lib/pgsql"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: postgres
+```
+
+## FreeBSD
+
+```yaml
+---
+__postgresql_major_version: 13
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/db/postgres/data{{ postgresql_major_version }}"
+__postgresql_service: postgresql
+__postgresql_package: databases/postgresql{{ postgresql_major_version }}-server
+__postgresql_home_dir: "/var/db/postgres"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: postgres
+```
+
+## OpenBSD
+
+```yaml
+---
+__postgresql_major_version: 13
+__postgresql_user: _postgresql
+__postgresql_group: _postgresql
+__postgresql_db_dir: "/var/postgresql/data"
+__postgresql_service: postgresql
+__postgresql_package: postgresql-server
+__postgresql_home_dir: "/var/postgresql"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: template1
+```
+
+## RedHat
+
+```yaml
+---
+__postgresql_major_version: 12
+__postgresql_user: postgres
+__postgresql_group: postgres
+__postgresql_db_dir: "/var/lib/pgsql/{{ postgresql_major_version }}/data"
+__postgresql_service: postgresql-{{ postgresql_major_version }}
+__postgresql_package: postgresql{{ postgresql_major_version }}-server
+__postgresql_home_dir: "/var/lib/pgsql"
+__postgresql_default_auth_method: scram-sha-256
+__postgresql_default_login_db: postgres
+```
+
 ## Ubuntu-20
 
-```text
+```yaml
 ---
 __postgresql_major_version: 12
 __postgresql_user: postgres
